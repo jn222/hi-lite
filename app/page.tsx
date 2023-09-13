@@ -1,30 +1,28 @@
-"use client";
+"use client"
 
-import { Container, TextField, Button, Box } from "@mui/material";
-import { useState, useEffect } from "react";
-import MaterialWrapper from "./components/material-wrapper";
-import MultipleChoiceGroup from "./components/multiple-choice-group";
-import NavigationBar from "./components/navigation-bar";
+import { useState, useEffect } from "react"
+import MultipleChoiceGroup from "./components/multiple-choice-group"
+import Button from "./components/button"
 
 const Page = () => {
   // TODO type this correctly
-  const [highlights, setHighlights] = useState<any>([]);
-  const [highlight, setHighlight] = useState<string>("");
+  const [highlights, setHighlights] = useState<any>([])
+  const [highlight, setHighlight] = useState<string>("")
   // TODO Use better state?
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string>("");
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string>("")
   async function fetchHighlights() {
-    const response = await fetch("/api/highlights");
-    const data = await response.json();
-    setHighlights(data.data);
+    const response = await fetch("/api/highlights")
+    const data = await response.json()
+    setHighlights(data.data)
   }
   useEffect(() => {
-    fetchHighlights();
-  }, []);
+    fetchHighlights()
+  }, [])
 
   const handleSubmit = async () => {
     try {
-      setError("");
+      setError("")
       // TODO Abstract this
       const res = await fetch("http://localhost:3001/highlights", {
         method: "POST",
@@ -33,52 +31,43 @@ const Page = () => {
           //   "API-Key": process.env.DATA_API_KEY,
         },
         body: JSON.stringify({ content: highlight }),
-      });
+      })
 
-      const data = await res.json();
-      setHighlights([...highlights, ...data]);
+      const data = await res.json()
+      setHighlights([...highlights, ...data])
+      setHighlight("")
     } catch (error: any) {
       // TODO display error msg
-      console.error(error);
-      setError(error.message);
+      console.error(error)
+      setError(error.message)
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  };
+  }
   return (
-    <MaterialWrapper>
-      <main>
-        <Container>
-          <Box>
-            <TextField
-              fullWidth
-              id="standard-textarea"
-              label="What went well?"
-              multiline
-              variant="standard"
-              value={highlight}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setHighlight(event.target.value);
-              }}
-            />
-          </Box>
-          <Box
-            display="flex"
-            sx={{ m: 2 }}
-            alignItems="center"
-            justifyContent="center"
-          >
-            <Button variant="outlined" onClick={handleSubmit}>
-              Done
-            </Button>
-          </Box>
-        </Container>
-        <Container>
-          {highlights && <MultipleChoiceGroup choices={highlights} />}
-        </Container>
-      </main>
-    </MaterialWrapper>
-  );
-};
+    <main>
+      <div className="items-center">
+        <div className="m-5">
+          <textarea
+            className="resize-none transition ease-in-out duration-300 text-center flex w-full focus:outline-none bg-transparent focus:border-[1px] border-solid border-transparent border-b-white"
+            maxLength={140}
+            placeholder="What's one thing that went well today?"
+            value={highlight}
+            onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+              setHighlight(event.target.value)
+            }}
+          />
+        </div>
+        <div className="flex items-center justify-center">
+          {/* TODO: put in separate component */}
+          <Button onClick={handleSubmit}>Done</Button>
+        </div>
+      </div>
+      <div className="m-5">
+        {highlights && <MultipleChoiceGroup choices={highlights} />}
+      </div>
+    </main>
+  )
+}
 
-export default Page;
+export default Page

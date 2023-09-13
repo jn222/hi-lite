@@ -1,15 +1,16 @@
-"use client";
+"use client"
 
-import { Button, Stack } from "@mui/material";
+import { Stack } from "@mui/material"
+import Button from "./button"
 
 type Highlight = {
-  id: string;
-  created_at: string;
-  content: string;
-};
+  id: string
+  created_at: string
+  content: string
+}
 
 interface Props {
-  choices: Highlight[];
+  choices: Highlight[]
 }
 
 const MultipleChoiceGroup = ({ choices }: Props) => {
@@ -19,7 +20,7 @@ const MultipleChoiceGroup = ({ choices }: Props) => {
         <Button key={choice.id}>{choice.content}</Button>
       ))}
     </Stack>
-  );
-};
+  )
+}
 
-export default MultipleChoiceGroup;
+export default MultipleChoiceGroup
