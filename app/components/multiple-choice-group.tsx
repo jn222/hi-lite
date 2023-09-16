@@ -1,6 +1,3 @@
-"use client"
-
-import { Stack } from "@mui/material"
 import Button from "./button"
 
 type Highlight = {
@@ -15,11 +12,13 @@ interface Props {
 
 const MultipleChoiceGroup = ({ choices }: Props) => {
   return (
-    <Stack spacing={2}>
+    <div>
       {choices.map((choice) => (
-        <Button key={choice.id}>{choice.content}</Button>
+        <Button className={"my-5"} key={choice.id}>
+          {choice.content}
+        </Button>
       ))}
-    </Stack>
+    </div>
   )
 }
 

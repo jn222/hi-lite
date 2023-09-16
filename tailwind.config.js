@@ -12,7 +12,27 @@ module.exports = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      keyframes: {
+        "y-scale": {
+          "0%": { transform: "scaleY(0)" },
+          "100%": { transform: "scaleY(1)" },
+        },
+        "slide-out": {
+          "0%": {
+            opacity: 100,
+            transform: "translateY(0)",
+          },
+          "100%": {
+            opacity: 0,
+            transform: "translateY(20px)",
+          },
+        },
+      },
+      animation: {
+        "y-scale": "y-scale 1s ease-in-out 1",
+        "slide-out": "slide-out .3s ease-in-out",
+      },
     },
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")],
 }

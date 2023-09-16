@@ -4,7 +4,7 @@ type Highlight = {
   content: string;
 };
 
-export async function GET() {
+export async function get() {
   const res = await fetch("http://localhost:3001/highlights", {
     headers: {
       "Content-Type": "application/json",
@@ -16,7 +16,7 @@ export async function GET() {
   return NextResponse.json({ data });
 }
 
-export async function POST(request: NextRequest) {
+export async function create(request: NextRequest) {
   const { body } = await request.json();
   console.log(body);
   const res = await fetch("http://localhost:3001/highlights", {

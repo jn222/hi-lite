@@ -16,20 +16,15 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+  height: 100vh
 }
 
-.background-animate {
-  -webkit-animation: gradientAnimation 1s ease;
-  -moz-animation: gradientAnimation 1s ease;
-  animation: gradientAnimation 1s ease;
+a {
+  @apply text-white hover:text-gray-400 active:text-gray-500 transition ease-in-out duration-300;
 }
 
-@keyframes gradientAnimation {
-    0%,
-    100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-  }
+/* TODO maybe put this in file */
+input:focus ~ .input-animate,
+input:not(:placeholder-shown) ~ .input-animate {
+  @apply text-blue-500 transform -translate-y-5 -translate-x-1 scale-75;
+}
