@@ -45,11 +45,11 @@ const Page = () => {
     }
   }
   return (
-    <main>
-      <div className="items-center">
-        <div className="m-5">
+    <main className="h-full items-center">
+      <div className="max-w-lg mx-auto">
+        <div className="m-5 align-middle">
           <textarea
-            className="resize-none transition ease-in-out duration-300 text-center flex w-full focus:outline-none bg-transparent focus:border-[1px] border-solid border-transparent border-b-white"
+            className="resize-none h-48 md:h-40 text-2xl flex w-full focus:outline-none bg-transparent focus:border-[1px] border-solid border-transparent border-b-white transition"
             maxLength={140}
             placeholder="What's one thing that went well today?"
             value={highlight}
@@ -57,6 +57,7 @@ const Page = () => {
               setHighlight(event.target.value)
             }}
           />
+          <span className="text-gray-400">{140 - highlight.length}</span>
         </div>
         <div className="flex items-center justify-center">
           {/* TODO: put in separate component */}
