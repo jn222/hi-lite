@@ -1,7 +1,7 @@
 import "./globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import NavigationBar from "./components/navigation-bar"
+import NavigationBar from "./components/navigation-bar/navigation-bar"
 import Head from "next/head"
 import AnimationWrapper from "./components/animation-wrapper"
 
@@ -9,11 +9,11 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "hi-lite",
-  description: "track the highlight of your day",
+  description: "track the highlight of your day"
 }
 
-export default function RootLayout({
-  children,
+export default function RootLayout ({
+  children
 }: {
   children: React.ReactNode
 }) {

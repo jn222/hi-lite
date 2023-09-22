@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react"
 interface Props {
   children: React.ReactNode
 }
+// TODO make exit anims work?
 const AnimationWrapper = ({ children }: Props) => {
   const router = useRouter()
   const prevScreen = useRef(children)
@@ -30,10 +31,10 @@ const AnimationWrapper = ({ children }: Props) => {
   return (
     <div
       className={classNames({
-        //use enter animation when showing the current screen
+        // use enter animation when showing the current screen
         // "animate-slideUpEnter": !transitioning,
-        //use an exit animation when showing the previous screen
-        "animate-slide-out": transitioning,
+        // use an exit animation when showing the previous screen
+        "animate-slide-out": transitioning
       })}
     >
       {children}

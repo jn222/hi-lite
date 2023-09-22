@@ -8,6 +8,19 @@
   --background-end-rgb: 0, 0, 0;
 }
 
+/* TODO Figure out autocomplete bug */
+/* input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px black inset;
+} */
+
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
@@ -16,7 +29,7 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
-  height: 100vh
+  height: 100vh;
 }
 
 a {
@@ -25,6 +38,9 @@ a {
 
 /* TODO maybe put this in file */
 input:focus ~ .input-animate,
+input:-webkit-autofill ~ .input-animate,
+input:-webkit-autofill:hover ~ .input-animate,
+input:-webkit-autofill:focus ~ .input-animate,
 input:not(:placeholder-shown) ~ .input-animate {
   @apply text-blue-500 transform -translate-y-5 -translate-x-1 scale-75;
 }

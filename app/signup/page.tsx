@@ -1,63 +1,46 @@
 "use client"
 
 import { useState } from "react"
-import Button from "../components/button"
-import Input from "../components/input"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
+import SignupForm, { type FormFields } from "./signup-form"
+import ErrorText from "../components/error-text"
+
+// TODO validation
 
 const Page = () => {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [name, setName] = useState("")
+  const router = useRouter()
+  const handleSubmit = async ({ email, name, password }: FormFields) => {
+    try {
+      setError("")
+      // TODO Abstract this, use useSWR or getServerSideProps
+      const res = await fetch("http://localhost:3001/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify({ email, password, display_name: name })
+      })
+
+      const response = await res.json()
+      if (!res.ok) throw response
+      router.push("/")
+    } catch (error: any) {
+      // TODO display error msg
+      console.error(error)
+      setError(error.message)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  // TODO Use better state?
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string>("")
+
   return (
     <main>
-      <div className="my-5 text-center">
-        <h1 className="text-2xl">Sign up</h1>
-        <div className="text-center my-5">
-          <Input
-            type="text"
-            label="Email"
-            value={email}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setEmail(event.target.value)
-            }}
-          />
-        </div>
-        <div className="text-center mb-5">
-          <Input
-            type="text"
-            label="Name"
-            value={name}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setName(event.target.value)
-            }}
-          />
-        </div>
-        <div className="text-center mb-5">
-          <Input
-            type="password"
-            label="Password"
-            value={password}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setPassword(event.target.value)
-            }}
-          />
-        </div>
-        <div className="text-center mb-5">
-          <Input
-            type="password"
-            label="Confirm password"
-            value={password}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setPassword(event.target.value)
-            }}
-          />
-        </div>
-        <div className="my-5">
-          <Button onClick={undefined}>Sign Up</Button>
-        </div>
-        <Link href="/login">Log in here</Link>
-      </div>
+      <SignupForm onSubmit={handleSubmit} submitError={error}/>
     </main>
   )
 }

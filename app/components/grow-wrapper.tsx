@@ -3,14 +3,14 @@ import classNames from "classnames"
 interface Props {
   children: React.ReactNode
   className?: string
-  onClick?: () => {}
+  onClick?: () => void
 }
 
 const GrowWrapper = ({ children, className, onClick }: Props) => {
   return (
     <div
       className={classNames(
-        "ease-in-out duration-500 hover:scale-110 active:scale-125 cursor-pointer",
+        "ease-in-out duration-500 hover:scale-125 active:scale-110 cursor-pointer",
         className
       )}
       onClick={onClick}
