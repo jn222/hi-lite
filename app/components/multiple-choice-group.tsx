@@ -1,31 +1,23 @@
 import classNames from "classnames"
 import Button from "./button"
-import { type TimeUnit } from "../types/highlight.types"
-
-const prompts = {
-  day: "What was your favorite highlight from yesterday?",
-  week: "What was your favorite highlight from last week?"
-}
-
-// TODO extract typing
-interface Highlight {
-  id: number
-  created_at: string
-  content: string
-}
+import { type Highlight, type TimeUnit } from "../types/highlight.types"
+import { type FC } from "react"
+import ErrorText from "./error-text"
 
 interface Props {
   choices: Highlight[]
   className?: string
   designation?: TimeUnit
-  onSelect: (id: number, designation: TimeUnit) => {}
+  onSelect: (id: number, designation: TimeUnit) => void
+  error?: string
 }
 
-const MultipleChoiceGroup = ({
+const MultipleChoiceGroup: FC<Props> = ({
   choices,
   className,
   designation,
-  onSelect
+  onSelect,
+  error
 }: Props) => {
   return designation ? (
     <div className={classNames("text-center", className)}>
@@ -49,6 +41,7 @@ const MultipleChoiceGroup = ({
           {content}
         </Button>
       ))}
+      <ErrorText error={error} />
     </div>
   ) : null
 }

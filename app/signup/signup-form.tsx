@@ -1,9 +1,10 @@
-import { Form, Formik } from "formik"
+import { Formik } from "formik"
 import Link from "next/link"
 import * as Yup from "yup"
 import Button from "../components/button"
 import Input from "../components/input"
 import ErrorText from "../components/error-text"
+import { type FC } from "react"
 
 const FormSchema = Yup.object({
   email: Yup.string()
@@ -25,7 +26,7 @@ interface Props {
   submitError?: string
 }
 
-const SignupForm = ({ onSubmit, submitError }: Props) => {
+const SignupForm: FC<Props> = ({ onSubmit, submitError }: Props) => {
   return (
     <Formik
       initialValues={{

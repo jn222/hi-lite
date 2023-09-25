@@ -1,11 +1,12 @@
 import classNames from "classnames"
+import { type FC } from "react"
 
 interface Props {
   error?: string
   className?: string
 }
 
-const ErrorText = ({ error, className }: Props) => {
+const ErrorText: FC<Props> = ({ error, className }: Props) => {
   return (
     <>
       {error && (

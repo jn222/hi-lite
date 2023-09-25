@@ -1,7 +1,6 @@
 import { type TimeUnit } from "@/app/types/highlight.types"
 import dayjs from "dayjs"
 
-// TODO Move to types file?
 interface Range {
   start: string
   end: string
@@ -31,7 +30,7 @@ export const timeFormats: Record<TimeFormat, string> = {
  * Uses previous unit (i.e. yesterday, last month, etc.) if no date is provided
  */
 export const range = (unit: TimeUnit, date?: string): Range => {
-  const start = dayjs(date || dayjs().subtract(1, unit).toISOString())
+  const start = dayjs(date ?? dayjs().subtract(1, unit).toISOString())
   return {
     start: start.startOf(unit).toISOString(),
     end: start.endOf(unit).toISOString()

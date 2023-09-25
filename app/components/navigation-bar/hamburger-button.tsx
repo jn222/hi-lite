@@ -1,4 +1,5 @@
 import classNames from "classnames"
+import { type FC } from "react"
 
 interface Props {
   className?: string
@@ -6,8 +7,13 @@ interface Props {
   onClick: () => void
 }
 
-const HamburgerButton = ({ className, expanded, onClick }: Props) => {
-  const hamburgerLine = "h-1 w-6 my-1 rounded bg-white transition transform duration-300 ease-in-out"
+const HamburgerButton: FC<Props> = ({
+  className,
+  expanded,
+  onClick
+}: Props) => {
+  const hamburgerLine =
+    "h-1 w-6 my-1 rounded bg-white transition transform duration-300 ease-in-out"
 
   return (
     <button

@@ -1,6 +1,6 @@
 import classNames from "classnames"
 import {
-  type ReactNode,
+  type FC,
   type ChangeEvent,
   type FocusEvent,
   type HTMLInputTypeAttribute
@@ -17,7 +17,7 @@ interface Props {
   onBlur?: (e: FocusEvent<any, Element>) => void
 }
 
-const Input = ({
+const Input: FC<Props> = ({
   type = "text",
   className = "",
   value = "",
@@ -26,7 +26,7 @@ const Input = ({
   maxLength,
   onChange,
   onBlur
-}: Props): ReactNode => (
+}: Props) => (
   <div
     className={classNames(
       "flex justify-center items-center bg-black",

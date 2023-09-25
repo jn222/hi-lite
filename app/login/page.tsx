@@ -1,6 +1,6 @@
 "use client"
 
-import { type FormEvent } from "react"
+import { type FC, type FormEvent } from "react"
 import type React from "react"
 import { useState } from "react"
 import Button from "../components/button"
@@ -8,31 +8,24 @@ import Input from "../components/input"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import ErrorText from "../components/error-text"
+import { UserApi } from "../services/user-api/user-api"
+import { useUserStore } from "../store/store"
 
-const Page = () => {
+const Page: FC = () => {
   const router = useRouter()
-  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const { setUser } = useUserStore()
+  const onSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault()
-    try {
-      setError("")
-      // TODO Abstract this, use useSWR or getServerSideProps
-      const res = await fetch("http://localhost:3001/login", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json"
-        },
-        credentials: "include",
-        body: JSON.stringify({ email, password })
+    setError("")
+    UserApi.login(email, password)
+      .then((res) => {
+        setUser(res.data)
+        router.push("/")
       })
-
-      const response = await res.json()
-      if (!res.ok) throw response
-      router.push("/")
-    } catch (error: any) {
-      // TODO display error msg
-      console.error(error)
-      setError(error.message)
-    }
+      .catch((err) => {
+        console.error(err)
+        setError(err.message)
+      })
   }
 
   const [error, setError] = useState<string>("")
@@ -43,7 +36,6 @@ const Page = () => {
     <main>
       <form onSubmit={onSubmit} className="my-5 text-center">
         <h1 className="text-2xl">Log in</h1>
-        {/* TODO Fix widths */}
         <div className="text-center my-5">
           <Input
             type="text"

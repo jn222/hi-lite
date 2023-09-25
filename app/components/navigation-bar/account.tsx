@@ -1,13 +1,14 @@
 import classNames from "classnames"
 import Link from "next/link"
+import { type FC } from "react"
 
 interface Props {
-  displayName?: string
+  name?: string
   onLogout: () => void
   className: string // Applies to each individual element
 }
 
-const Account = ({ displayName, onLogout, className }: Props) => {
+const Account: FC<Props> = ({ name: displayName, onLogout, className }) => {
   return displayName ? (
     // TODO account image
     <>

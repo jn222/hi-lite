@@ -1,7 +1,7 @@
 export const getEnvironmentVariable = (v: string): string => {
-  const ret = process.env[v];
+  const ret = process.env[v]
   if (ret === undefined) {
-    throw new Error("process.env." + v + " is undefined!");
+    throw new Error("process.env." + v + " is undefined!")
   }
-  return ret;
-};
+  return ret
+}

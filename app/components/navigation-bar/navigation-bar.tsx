@@ -1,46 +1,41 @@
 "use client"
 
 import classNames from "classnames"
-import { type ReactNode, useState } from "react"
+import { type FC, useState, useEffect } from "react"
 import Link from "next/link"
-import useSWR from "swr"
 import { useRouter } from "next/navigation"
 import NavLogo from "./nav-logo"
 import HamburgerButton from "./hamburger-button"
 import Account from "./account"
+import { UserApi } from "@/app/services/user-api/user-api"
+import { useUserStore } from "@/app/store/store"
 
-const fetcher = async (path: string) =>
-  await fetch(`http://localhost:3001${path}`, { credentials: "include" }).then(
-    async (res) => await res.json()
-  )
-
-const NavigationBar = (): ReactNode => {
+const NavigationBar: FC = () => {
   const router = useRouter()
-  // const { user } = useUser()
-  // Maybe fetch conditionally?
-  let { data: user } = useSWR("/authenticate", fetcher)
-
-  const logout = async (): Promise<void> => {
-    try {
-      await fetch("http://localhost:3001/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include"
-      })
-      user = undefined
-    } catch (error: any) {
-      // TODO display error msg
-      console.error(error)
-    } finally {
-      router.push("/login")
-    }
-  }
-
   const [expanded, setExpanded] = useState(false)
-  const toggleNav = () => {
-    setExpanded(!expanded)
+  const { user, setUser } = useUserStore((state) => state)
+
+  useEffect(() => {
+    UserApi.authenticate()
+      .then((res) => {
+        setUser(res.data)
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+  }, [])
+
+  const logout = (): void => {
+    UserApi.logout()
+      .then((_res) => {
+        setUser(undefined)
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+      .finally(() => {
+        router.push("/login")
+      })
   }
 
   return (
@@ -58,14 +53,19 @@ const NavigationBar = (): ReactNode => {
 
           <div className="hidden md:flex items-center space-x-1">
             <Account
-              displayName={user?.display_name}
+              name={user?.name}
               onLogout={logout}
               className="py-5 px-3"
             />
           </div>
 
           <div className="md:hidden flex items-center z-50">
-            <HamburgerButton expanded={expanded} onClick={toggleNav} />
+            <HamburgerButton
+              expanded={expanded}
+              onClick={() => {
+                setExpanded(!expanded)
+              }}
+            />
           </div>
         </div>
       </div>
@@ -76,11 +76,7 @@ const NavigationBar = (): ReactNode => {
           expanded ? "translate-x-0 " : "translate-x-full"
         )}
       >
-        <Account
-          className="block my-10"
-          displayName={user?.display_name}
-          onLogout={logout}
-        />
+        <Account className="block my-10" name={user?.name} onLogout={logout} />
         <Link href="/highlights" className="block my-10">
           Highlights
         </Link>

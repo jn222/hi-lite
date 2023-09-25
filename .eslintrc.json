@@ -16,8 +16,10 @@
   "plugins": ["react"],
   "rules": {
     "quotes": "off",
-    "multiline-ternary": ["error", "never"],
+    "multiline-ternary": "off",
     "@typescript-eslint/quotes": ["error", "double"],
-    "@typescript-eslint/strict-boolean-expressions": "off"
+    "@typescript-eslint/strict-boolean-expressions": "off",
+    // Turn off eslint indent because we use prettier
+    "@typescript-eslint/indent": "off"
   }
 }

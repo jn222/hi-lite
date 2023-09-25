@@ -3,7 +3,7 @@ import GrowWrapper from "../components/grow-wrapper"
 import Pulse from "../components/pulse"
 import { type TimeFormat, formatIsoString } from "../lib/utils/time"
 import { type Highlight } from "../types/highlight.types"
-import { type ReactNode } from "react"
+import { type FC } from "react"
 
 interface Props {
   highlight: Highlight
@@ -13,13 +13,13 @@ interface Props {
   variant?: "small" | "large"
 }
 
-const HighlightListItem = ({
+const HighlightListItem: FC<Props> = ({
   highlight,
   onSelect,
   animationOrder,
   timeWindow,
   variant = "small"
-}: Props): ReactNode => {
+}: Props) => {
   return variant === "small" ? (
     <div key={highlight.id} className="mb-4 text-xl">
       <div className="border-l-white border-[1px] w-0 h-16 mx-auto animate-y-scale" />

@@ -1,46 +1,32 @@
 "use client"
 
-import { useState } from "react"
+import { type FC, useState } from "react"
 import { useRouter } from "next/navigation"
 import SignupForm, { type FormFields } from "./signup-form"
-import ErrorText from "../components/error-text"
+import { UserApi } from "../services/user-api/user-api"
+import { useUserStore } from "../store/store"
 
-// TODO validation
-
-const Page = () => {
+const Page: FC = () => {
   const router = useRouter()
-  const handleSubmit = async ({ email, name, password }: FormFields) => {
-    try {
-      setError("")
-      // TODO Abstract this, use useSWR or getServerSideProps
-      const res = await fetch("http://localhost:3001/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include",
-        body: JSON.stringify({ email, password, display_name: name })
-      })
-
-      const response = await res.json()
-      if (!res.ok) throw response
-      router.push("/")
-    } catch (error: any) {
-      // TODO display error msg
-      console.error(error)
-      setError(error.message)
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  // TODO Use better state?
-  const [submitting, setSubmitting] = useState(false)
+  const { setUser } = useUserStore()
   const [error, setError] = useState<string>("")
+
+  const handleSubmit = (userInfo: FormFields): void => {
+    const { name, email, password } = userInfo
+    UserApi.signup(name, email, password)
+      .then((res) => {
+        setUser(res.data)
+        router.push("/")
+      })
+      .catch((err) => {
+        console.error(err)
+        setError(err.message)
+      })
+  }
 
   return (
     <main>
-      <SignupForm onSubmit={handleSubmit} submitError={error}/>
+      <SignupForm onSubmit={handleSubmit} submitError={error} />
     </main>
   )
 }

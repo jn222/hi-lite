@@ -1,12 +1,13 @@
 import classNames from "classnames"
+import { type FC } from "react"
 
 interface Props {
-  onClick?: () => {}
+  onClick?: () => void
   className?: string
   variant?: "small" | "large"
 }
 
-const Pulse = ({ onClick, className, variant = "small" }: Props) => {
+const Pulse: FC<Props> = ({ onClick, className, variant = "small" }: Props) => {
   return (
     <span
       className={classNames(

@@ -1,8 +1,7 @@
-import * as
-import { ReactNode } from "react"
+import { type FC } from "react"
 import GrowWrapper from "../components/grow-wrapper"
 import { orderedTimeUnits } from "../lib/utils/time"
-import { Highlight, TimeUnit } from "../types/highlight.types"
+import { type Highlight, type TimeUnit } from "../types/highlight.types"
 import HighlightListItem from "./highlight-list-item"
 
 interface Props {
@@ -12,12 +11,12 @@ interface Props {
   onSelect?: (highlight: Highlight) => void
 }
 
-const HighlightList = ({
+const HighlightList: FC<Props> = ({
   selectedHighlight,
   highlights,
   timeWindow,
   onSelect
-}: Props): ReactNode => {
+}: Props) => {
   // Get one level down in time formatting to format main list
   const index = orderedTimeUnits.indexOf(timeWindow) - 1
   const listTimeWindow = orderedTimeUnits[index]
@@ -33,6 +32,7 @@ const HighlightList = ({
       {highlights?.length ? (
         highlights.map((highlight, index) => (
           <HighlightListItem
+            key={highlight.id}
             highlight={highlight}
             onSelect={onSelect}
             animationOrder={index}

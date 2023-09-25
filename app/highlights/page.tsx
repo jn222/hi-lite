@@ -1,98 +1,71 @@
 "use client"
 
 import GrowWrapper from "../components/grow-wrapper"
-import { useEffect, useState } from "react"
-import { formatIsoString, orderedTimeUnits, range } from "../lib/utils/time"
+import { type FC, useEffect, useState } from "react"
+import { orderedTimeUnits, range } from "../lib/utils/time"
 import { type Highlight, type TimeUnit } from "../types/highlight.types"
 import HighlightList from "./highlight-list"
 import { useRouter } from "next/navigation"
-import { HighlightApi } from "../services/highlight-api"
+import { HighlightApi } from "../services/highlight-api/highlight-api"
+import YearlyHighlightList from "./yearly-highlight-list"
 
-const groupHighlightsByYear = (highlights: Highlight[]) => {
-  const highlightsByYear: Record<string, Highlight[]> = {}
-  for (let i = 0; i < highlights.length; i++) {
-    const highlight = highlights[i]
-    const year = formatIsoString("year", highlight.created_at)
-    if (highlightsByYear[year]) {
-      highlightsByYear[year].push(highlight)
-    } else {
-      highlightsByYear[year] = [highlight]
-    }
-  }
-  return highlightsByYear
-}
-
-const YearlyHighlightList = ({
-  highlights = [],
-  onSelect
-}: {
-  highlights?: Highlight[]
-  onSelect: (highlight: Highlight) => void
-}) => {
-  const highlightsByYear: Record<string, Highlight[]> =
-    groupHighlightsByYear(highlights)
-  return Object.keys(highlightsByYear).map((year) => {
-    const yearlyHighlight = highlightsByYear[year].find(
-      (highlight: Highlight) => highlight.designation.includes("year")
-    )
-    return (
-      <>
-        {!yearlyHighlight && <p className="my-2 text-2xl">{year}</p>}
-        <HighlightList
-          selectedHighlight={yearlyHighlight}
-          highlights={highlightsByYear[year]}
-          timeWindow={"year"}
-          onSelect={onSelect}
-        />
-      </>
-    )
-  })
-}
-
-const Page = () => {
+const Page: FC = () => {
   const router = useRouter()
-  //  TODO type highlights
   const [highlights, setHighlights] = useState<Highlight[]>()
   const [selectedHighlight, setSelectedHighlight] = useState<
-  Highlight | undefined
+    Highlight | undefined
   >()
   const [timeWindow, setTimeWindow] = useState<TimeUnit>("year")
 
-  // TODO useSWR, maybe throw in service
-  async function fetchHighlights (designation?: TimeUnit, date?: string) {
-    let dateQuery = ""
+  const fetchHighlights = (
+    designation?: TimeUnit,
+    date?: string,
+    callback?: (highlights: Highlight[]) => void
+  ): void => {
+    let queryStart, queryEnd
     if (date && designation) {
       const { start, end } = range(designation, date)
-      dateQuery = `&start=${start}&end=${end}`
+      queryStart = start
+      queryEnd = end
     }
-    const response = await fetch(
-      `http://localhost:3001/highlights?designations=${
-        designation || "year,month"
-      }${dateQuery}`,
-      {
-        credentials: "include"
-      }
+    HighlightApi.getHighlights(
+      designation === "year"
+        ? ["year", "month"]
+        : designation
+        ? [designation]
+        : undefined,
+      queryStart,
+      queryEnd
     )
-    const data = await response.json()
-    data.length && setHighlights([...data])
+      .then((res) => {
+        if (res.data.length) {
+          setHighlights([...res.data])
+          callback && callback(res.data)
+        }
+      })
+      .catch((err) => {
+        console.error(err)
+      })
   }
 
   useEffect(() => {
-    HighlightApi.getHighlights(
-      timeWindow === "year" ? ["year", "month"] : [timeWindow],
-      selectedHighlight?.created_at
-    )
-  }, [selectedHighlight, timeWindow])
+    fetchHighlights(timeWindow)
+  }, [])
 
-  const selectHighlight = (highlight: Highlight) => {
-    setSelectedHighlight(highlight)
+  const selectHighlight = (highlight: Highlight): void => {
     const newTimeWindow =
       orderedTimeUnits[orderedTimeUnits.indexOf(timeWindow) - 1]
     // Ugly workaround for typing
     newTimeWindow !== "time" && setTimeWindow(newTimeWindow)
+    setSelectedHighlight(highlight)
+    fetchHighlights(
+      // Ugly workaround for typing
+      newTimeWindow !== "time" ? newTimeWindow : undefined,
+      highlight.created_at
+    )
   }
 
-  const back = () => {
+  const back = (): void => {
     if (timeWindow === "year") {
       router.push("/")
     } else {
@@ -100,17 +73,19 @@ const Page = () => {
         orderedTimeUnits[orderedTimeUnits.indexOf(timeWindow) + 1]
       // Ugly workaround for typing
       newTimeWindow !== "time" && setTimeWindow(newTimeWindow)
-      if (timeWindow === "month") {
+      if (newTimeWindow === "year") {
         setSelectedHighlight(undefined)
-        fetchHighlights()
+        fetchHighlights("year")
       } else {
-        await fetchHighlights(timeWindow, selectedHighlight?.created_at)
-        // Fetch in broader time window, set selected highlight based on which has correct designation
-        setSelectedHighlight(
-          highlights?.find((highlight) =>
-            highlight.designation.includes(timeWindow)
+        const callback = (highlights: Highlight[]): void => {
+          // Fetch in broader time window, set selected highlight based on which has correct designation
+          setSelectedHighlight(
+            highlights?.find((highlight) =>
+              highlight.designation.includes(timeWindow)
+            )
           )
-        )
+        }
+        fetchHighlights(timeWindow, selectedHighlight?.created_at, callback)
       }
     }
   }

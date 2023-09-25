@@ -1,80 +1,58 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, type FC } from "react"
 import MultipleChoiceGroup from "./components/multiple-choice-group"
 import Button from "./components/button"
-import { range } from "./lib/utils/time"
 import { type TimeUnit } from "./types/highlight.types"
 import ErrorText from "./components/error-text"
+import { HighlightApi } from "./services/highlight-api/highlight-api"
 
-// TODO page not found
 // TODO document each component
 
-const Page = () => {
+const Page: FC = () => {
   const [highlights, setHighlights] = useState<any>([])
   const [highlight, setHighlight] = useState<string>("")
   const [designation, setDesignation] = useState<TimeUnit | undefined>()
-  // TODO Use better state?
-  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string>("")
-  async function fetchPendingHighlights () {
-    try {
-      const response = await fetch("http://localhost:3001/highlights/pending", {
-        credentials: "include"
+  const [selectionError, setSelectionError] = useState<string>("")
+
+  const fetchPendingHighlights = (): void => {
+    HighlightApi.getPendingHighlights()
+      .then((res) => {
+        setHighlights([...res.data.highlights])
+        setDesignation(res.data.designation)
       })
-      const data = await response.json()
-      if (!response.ok) throw data
-      setHighlights([...data.highlights])
-      setDesignation(data.designation)
-    } catch (error: any) {
-      console.error(error)
-    }
+      .catch((err) => {
+        console.error(err)
+      })
   }
+
   useEffect(() => {
     fetchPendingHighlights()
   }, [])
 
-  const handleSubmit = async () => {
-    try {
-      setError("")
-      // TODO Abstract this, use useSWR or getServerSideProps
-      const res = await fetch("http://localhost:3001/highlights", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include",
-        body: JSON.stringify({ content: highlight })
+  const handleSubmit = (content: string): void => {
+    setError("")
+    HighlightApi.createHighlight(content)
+      .then((_res) => {
+        setHighlight("")
       })
-
-      const response = await res.json()
-      if (!res.ok) throw response
-      setHighlight("")
-    } catch (error: any) {
-      console.error(error)
-      setError(error.message)
-    } finally {
-      setSubmitting(false)
-    }
+      .catch((err) => {
+        console.error(err)
+        setError(err.message)
+      })
   }
-  const onSelect = async (id: number, designation: TimeUnit) => {
-    try {
-      setError("")
-      const res = await fetch(`http://localhost:3001/highlights/${id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include",
-        body: JSON.stringify({ designation })
+
+  const onSelect = (id: number, designation: TimeUnit): void => {
+    setError("")
+    HighlightApi.designateHighlight(id, designation)
+      .then((_res) => {
+        fetchPendingHighlights()
       })
-      const response = await res.json()
-      if (!res.ok) throw response
-      fetchPendingHighlights()
-    } catch (error: any) {
-      console.error(error)
-      setError(error.message)
-    }
+      .catch((err) => {
+        console.error(err)
+        setSelectionError(err.message)
+      })
   }
   return (
     <main className="h-full items-center">
@@ -92,7 +70,12 @@ const Page = () => {
           <span className="text-gray-400">{140 - highlight.length}</span>
         </div>
         <div className="flex items-center justify-center">
-          <Button onClick={handleSubmit} disabled={!highlight}>
+          <Button
+            onClick={() => {
+              handleSubmit(highlight)
+            }}
+            disabled={!highlight}
+          >
             Done
           </Button>
         </div>
@@ -105,6 +88,7 @@ const Page = () => {
         choices={highlights}
         onSelect={onSelect}
         designation={designation}
+        error={selectionError}
       />
     </main>
   )

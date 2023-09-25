@@ -1,8 +1,9 @@
 import Link from "next/link"
 import GrowWrapper from "../grow-wrapper"
 import Image from "next/image"
+import { type FC } from "react"
 
-const NavLogo = () => {
+const NavLogo: FC = () => {
   return (
     <GrowWrapper>
       <Link
