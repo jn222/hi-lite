@@ -1,63 +1,32 @@
 "use client"
 
-import { useState } from "react"
-import Button from "../components/button"
-import Input from "../components/input"
-import Link from "next/link"
+import { type FC, useState } from "react"
+import { useRouter } from "next/navigation"
+import SignupForm, { type FormFields } from "./signup-form"
+import { UserApi } from "../services/user-api/user-api"
+import { useUserStore } from "../store/store"
 
-const Page = () => {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [name, setName] = useState("")
+const Page: FC = () => {
+  const router = useRouter()
+  const { setUser } = useUserStore()
+  const [error, setError] = useState<string>("")
+
+  const handleSubmit = (userInfo: FormFields): void => {
+    const { name, email, password } = userInfo
+    UserApi.signup(name, email, password)
+      .then((res) => {
+        setUser(res.data)
+        router.push("/")
+      })
+      .catch((err) => {
+        console.error(err)
+        setError(err.message)
+      })
+  }
+
   return (
     <main>
-      <div className="my-5 text-center">
-        <h1 className="text-2xl">Sign up</h1>
-        <div className="text-center my-5">
-          <Input
-            type="text"
-            label="Email"
-            value={email}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setEmail(event.target.value)
-            }}
-          />
-        </div>
-        <div className="text-center mb-5">
-          <Input
-            type="text"
-            label="Name"
-            value={name}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setName(event.target.value)
-            }}
-          />
-        </div>
-        <div className="text-center mb-5">
-          <Input
-            type="password"
-            label="Password"
-            value={password}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setPassword(event.target.value)
-            }}
-          />
-        </div>
-        <div className="text-center mb-5">
-          <Input
-            type="password"
-            label="Confirm password"
-            value={password}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setPassword(event.target.value)
-            }}
-          />
-        </div>
-        <div className="my-5">
-          <Button onClick={undefined}>Sign Up</Button>
-        </div>
-        <Link href="/login">Log in here</Link>
-      </div>
+      <SignupForm onSubmit={handleSubmit} submitError={error} />
     </main>
   )
 }

@@ -1,19 +1,30 @@
 import classNames from "classnames"
+import { type FC, type ReactNode } from "react"
 
 interface Props {
-  onClick?: () => {}
+  onClick?: () => void
   className?: string
-  children?: React.ReactNode
+  disabled?: boolean
+  children?: ReactNode
+  type?: string
 }
 
-const Button = ({ onClick, className = "", children }: Props) => {
+const Button: FC<Props> = ({
+  onClick,
+  className = "",
+  disabled,
+  children,
+  type
+}: Props) => {
   return (
     <button
       className={classNames(
-        "bg-transparent text-xl transition ease-in-out duration-300 hover:bg-gray-800 active:bg-gray-600 text-white py-2 px-4 border border-white rounded",
+        "bg-transparent text-xl transition ease-in-out duration-300 text-white py-2 px-4 border border-white rounded-lg disabled:opacity-50",
+        !disabled && "hover:bg-gray-800 active:bg-gray-600",
         className
       )}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </button>

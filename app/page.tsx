@@ -1,53 +1,63 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, type FC } from "react"
 import MultipleChoiceGroup from "./components/multiple-choice-group"
 import Button from "./components/button"
+import { type TimeUnit } from "./types/highlight.types"
+import ErrorText from "./components/error-text"
+import { HighlightApi } from "./services/highlight-api/highlight-api"
 
-const Page = () => {
-  // TODO type this correctly
+// TODO document each component
+
+const Page: FC = () => {
   const [highlights, setHighlights] = useState<any>([])
   const [highlight, setHighlight] = useState<string>("")
-  // TODO Use better state?
-  const [submitting, setSubmitting] = useState(false)
+  const [designation, setDesignation] = useState<TimeUnit | undefined>()
   const [error, setError] = useState<string>("")
-  async function fetchHighlights() {
-    const response = await fetch("/api/highlights")
-    const data = await response.json()
-    setHighlights(data.data)
+  const [selectionError, setSelectionError] = useState<string>("")
+
+  const fetchPendingHighlights = (): void => {
+    HighlightApi.getPendingHighlights()
+      .then((res) => {
+        setHighlights([...res.data.highlights])
+        setDesignation(res.data.designation)
+      })
+      .catch((err) => {
+        console.error(err)
+      })
   }
+
   useEffect(() => {
-    fetchHighlights()
+    fetchPendingHighlights()
   }, [])
 
-  const handleSubmit = async () => {
-    try {
-      setError("")
-      // TODO Abstract this
-      const res = await fetch("http://localhost:3001/highlights", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          //   "API-Key": process.env.DATA_API_KEY,
-        },
-        body: JSON.stringify({ content: highlight }),
+  const handleSubmit = (content: string): void => {
+    setError("")
+    HighlightApi.createHighlight(content)
+      .then((_res) => {
+        setHighlight("")
       })
+      .catch((err) => {
+        console.error(err)
+        setError(err.message)
+      })
+  }
 
-      const data = await res.json()
-      setHighlights([...highlights, ...data])
-      setHighlight("")
-    } catch (error: any) {
-      // TODO display error msg
-      console.error(error)
-      setError(error.message)
-    } finally {
-      setSubmitting(false)
-    }
+  const onSelect = (id: number, designation: TimeUnit): void => {
+    setError("")
+    HighlightApi.designateHighlight(id, designation)
+      .then((_res) => {
+        fetchPendingHighlights()
+      })
+      .catch((err) => {
+        console.error(err)
+        setSelectionError(err.message)
+      })
   }
   return (
     <main className="h-full items-center">
-      <div className="max-w-lg mx-auto">
-        <div className="m-5 align-middle">
+      <div className="max-w-lg mx-auto p-5">
+        <div className="align-middle">
           <textarea
             className="resize-none h-48 md:h-40 text-2xl flex w-full focus:outline-none bg-transparent focus:border-[1px] border-solid border-transparent border-b-white transition"
             maxLength={140}
@@ -60,13 +70,26 @@ const Page = () => {
           <span className="text-gray-400">{140 - highlight.length}</span>
         </div>
         <div className="flex items-center justify-center">
-          {/* TODO: put in separate component */}
-          <Button onClick={handleSubmit}>Done</Button>
+          <Button
+            onClick={() => {
+              handleSubmit(highlight)
+            }}
+            disabled={!highlight}
+          >
+            Done
+          </Button>
+        </div>
+        <div className="text-center">
+          <ErrorText error={error} />
         </div>
       </div>
-      <div className="m-5">
-        {highlights && <MultipleChoiceGroup choices={highlights} />}
-      </div>
+      <MultipleChoiceGroup
+        className="m-5 my-[10vh] max-w-xl mx-auto"
+        choices={highlights}
+        onSelect={onSelect}
+        designation={designation}
+        error={selectionError}
+      />
     </main>
   )
 }

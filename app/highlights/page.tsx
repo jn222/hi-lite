@@ -1,66 +1,115 @@
-import classNames from "classnames"
-import Pulse from "../components/pulse"
+"use client"
+
 import GrowWrapper from "../components/grow-wrapper"
+import { type FC, useEffect, useState } from "react"
+import { orderedTimeUnits, range } from "../lib/utils/time"
+import { type Highlight, type TimeUnit } from "../types/highlight.types"
+import HighlightList from "./highlight-list"
+import { useRouter } from "next/navigation"
+import { HighlightApi } from "../services/highlight-api/highlight-api"
+import YearlyHighlightList from "./yearly-highlight-list"
 
-const weeklyHighlight = {
-  id: 1,
-  created_at: "Week of Sep 13",
-  content: "Ate an apple",
-}
+const Page: FC = () => {
+  const router = useRouter()
+  const [highlights, setHighlights] = useState<Highlight[]>()
+  const [selectedHighlight, setSelectedHighlight] = useState<
+    Highlight | undefined
+  >()
+  const [timeWindow, setTimeWindow] = useState<TimeUnit>("year")
 
-const dailyHighlights = [
-  {
-    id: 1,
-    created_at: "Sep 13, 1:10PM",
-    content: "Ate an apple",
-  },
-  {
-    id: 2,
-    created_at: "Sep 12, 1:10PM",
-    content: "Ate an orange",
-  },
-  {
-    id: 3,
-    created_at: "Sep 13, 1:10PM",
-    content: "Ate a banana",
-  },
-]
+  const fetchHighlights = (
+    designation?: TimeUnit,
+    date?: string,
+    callback?: (highlights: Highlight[]) => void
+  ): void => {
+    let queryStart, queryEnd
+    if (date && designation) {
+      const { start, end } = range(designation, date)
+      queryStart = start
+      queryEnd = end
+    }
+    HighlightApi.getHighlights(
+      designation === "year"
+        ? ["year", "month"]
+        : designation
+        ? [designation]
+        : undefined,
+      queryStart,
+      queryEnd
+    )
+      .then((res) => {
+        if (res.data.length) {
+          setHighlights([...res.data])
+          callback && callback(res.data)
+        }
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+  }
 
-// TODO Make wrapper for grow animation
+  useEffect(() => {
+    fetchHighlights(timeWindow)
+  }, [])
 
-const Page = () => {
+  const selectHighlight = (highlight: Highlight): void => {
+    const newTimeWindow =
+      orderedTimeUnits[orderedTimeUnits.indexOf(timeWindow) - 1]
+    // Ugly workaround for typing
+    newTimeWindow !== "time" && setTimeWindow(newTimeWindow)
+    setSelectedHighlight(highlight)
+    fetchHighlights(
+      // Ugly workaround for typing
+      newTimeWindow !== "time" ? newTimeWindow : undefined,
+      highlight.created_at
+    )
+  }
+
+  const back = (): void => {
+    if (timeWindow === "year") {
+      router.push("/")
+    } else {
+      const newTimeWindow =
+        orderedTimeUnits[orderedTimeUnits.indexOf(timeWindow) + 1]
+      // Ugly workaround for typing
+      newTimeWindow !== "time" && setTimeWindow(newTimeWindow)
+      if (newTimeWindow === "year") {
+        setSelectedHighlight(undefined)
+        fetchHighlights("year")
+      } else {
+        const callback = (highlights: Highlight[]): void => {
+          // Fetch in broader time window, set selected highlight based on which has correct designation
+          setSelectedHighlight(
+            highlights?.find((highlight) =>
+              highlight.designation.includes(timeWindow)
+            )
+          )
+        }
+        fetchHighlights(timeWindow, selectedHighlight?.created_at, callback)
+      }
+    }
+  }
+
   return (
     <main>
-      <div className="fixed px-5 text-4xl">{"<"}</div>
+      <GrowWrapper className="fixed px-5 text-4xl ml-[10vw]" onClick={back}>
+        {"<"}
+      </GrowWrapper>
       <div className="w-full px-5 text-center">
-        <GrowWrapper className="my-2">
-          <h1 className="text-xl">No highlights yet</h1>
-        </GrowWrapper>
-        <GrowWrapper className="my-2 text-xl">
-          <p className="text-gray-400">{weeklyHighlight.created_at}</p>
-          <p>{weeklyHighlight.content}</p>
-        </GrowWrapper>
-        <Pulse variant="large" className="mx-auto" />
-        {dailyHighlights.map((highlight, index) => (
-          <div key={highlight.id} className="mb-4">
-            <div className="border-l-white border-[1px] w-0 h-16 mx-auto animate-y-scale" />
-            <GrowWrapper>
-              <Pulse
-                variant="small"
-                className="mx-auto mb-4 animate-in fade-in ease-in-out duration-500"
-              />
-              <div
-                className={classNames(
-                  `delay-${500 * index}`,
-                  "animate-in fade-in slide-in-from-left-4 ease-in-out duration-500"
-                )}
-              >
-                <p className="text-gray-400">{highlight.created_at}</p>
-                <p>{highlight.content}</p>
-              </div>
-            </GrowWrapper>
-          </div>
-        ))}
+        {/* Use Different formatting for displaying all year/month highlights */}
+        {timeWindow === "year" ? (
+          <YearlyHighlightList
+            highlights={highlights}
+            onSelect={selectHighlight}
+          />
+        ) : (
+          <HighlightList
+            selectedHighlight={selectedHighlight}
+            highlights={highlights}
+            timeWindow={timeWindow}
+            onSelect={timeWindow !== "day" ? selectHighlight : undefined}
+          />
+        )}
       </div>
     </main>
   )

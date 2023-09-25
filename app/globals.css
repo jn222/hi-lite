@@ -16,7 +16,7 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
-  height: 100vh
+  height: 100vh;
 }
 
 a {
@@ -25,6 +25,9 @@ a {
 
 /* TODO maybe put this in file */
 input:focus ~ .input-animate,
+input:-webkit-autofill ~ .input-animate,
+input:-webkit-autofill:hover ~ .input-animate,
+input:-webkit-autofill:focus ~ .input-animate,
 input:not(:placeholder-shown) ~ .input-animate {
   @apply text-blue-500 transform -translate-y-5 -translate-x-1 scale-75;
 }
