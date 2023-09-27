@@ -9,6 +9,10 @@ import { useRouter } from "next/navigation"
 import { HighlightApi } from "../services/highlight-api/highlight-api"
 import YearlyHighlightList from "./yearly-highlight-list"
 
+/**
+ * Page displaying user's past recorded yearly, monthly, weekly,
+ * and daily highlights hierarchically
+ */
 const Page: FC = () => {
   const router = useRouter()
   const [highlights, setHighlights] = useState<Highlight[]>()
