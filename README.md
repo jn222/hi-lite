@@ -4,6 +4,20 @@ A web app designed to help bring more awareness to the best parts of your day. I
 
 The server for this app can be found [here](https://github.com/jn222/hi-lite-api).
 
+## Demo
+
+Client: https://hi-lite.vercel.app/
+
+Server: https://hi-lite-api.onrender.com/
+
+## Screenshots
+
+![Main Page](public/main.png)
+
+![Highlight Page 1](public/highlight_1.png)
+
+![Highlight Page 2](public/highlight_2.png)
+
 ## Tech Stack
 
 **Client:** NextJS [(App Directory)](https://nextjs.org/docs/getting-started/project-structure), React, [TailwindCSS](https://tailwindcss.com/), [Zustand](https://github.com/pmndrs/zustand), Jest
@@ -48,20 +62,6 @@ Start a production build
   yarn build
   yarn start
 ```
-
-## Demo
-
-Client: https://hi-lite.vercel.app/
-
-Server: https://hi-lite-api.onrender.com/
-
-## Screenshots
-
-![Main Page](public/main.png)
-
-![Highlight Page 1](public/highlight_1.png)
-
-![Highlight Page 2](public/highlight_2.png)
 
 ## Todos
 
