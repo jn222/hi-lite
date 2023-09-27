@@ -69,6 +69,7 @@ Server: https://hi-lite-api.onrender.com/
 - Figure out exit animations
 - Make intro/about page to hide entry page if not logged in
 - Make storybook work
+- Centralize stylings
 
 ## Known bugs
 
