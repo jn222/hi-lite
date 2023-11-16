@@ -3,6 +3,8 @@ import GrowWrapper from "../grow-wrapper"
 import Image from "next/image"
 import { type FC } from "react"
 
+/** Navigation logo */
+
 const NavLogo: FC = () => {
   return (
     <GrowWrapper>

@@ -7,6 +7,8 @@ interface Props {
   onClick?: () => void
 }
 
+/** Wrapper for growth animation on rollover and click */
+
 const GrowWrapper: FC<Props> = ({ children, className, onClick }) => {
   return (
     <div

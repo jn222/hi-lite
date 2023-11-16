@@ -13,6 +13,8 @@ interface Props {
   variant?: "small" | "large"
 }
 
+/** Displays highlight with time designation in a highlight list */
+
 const HighlightListItem: FC<Props> = ({
   highlight,
   onSelect,

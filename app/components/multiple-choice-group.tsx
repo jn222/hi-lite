@@ -12,6 +12,8 @@ interface Props {
   error?: string
 }
 
+/** Multiple choice component for designating highlights */
+
 const MultipleChoiceGroup: FC<Props> = ({
   choices,
   className,

@@ -11,6 +11,8 @@ interface Props {
   onSelect?: (highlight: Highlight) => void
 }
 
+/** Shows all highlights of a certain designation */
+
 const HighlightList: FC<Props> = ({
   selectedHighlight,
   highlights,

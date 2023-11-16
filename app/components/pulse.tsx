@@ -7,6 +7,8 @@ interface Props {
   variant?: "small" | "large"
 }
 
+/** Animated pusling dot */
+
 const Pulse: FC<Props> = ({ onClick, className, variant = "small" }: Props) => {
   return (
     <span

@@ -9,6 +9,8 @@ interface Props {
   type?: string
 }
 
+/** Stylized button component with animations */
+
 const Button: FC<Props> = ({
   onClick,
   className = "",

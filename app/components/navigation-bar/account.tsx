@@ -8,6 +8,10 @@ interface Props {
   className: string // Applies to each individual element
 }
 
+/**
+ * Displays account info of logged in user
+ */
+
 const Account: FC<Props> = ({ name: displayName, onLogout, className }) => {
   return displayName ? (
     // TODO account image

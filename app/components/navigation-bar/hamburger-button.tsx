@@ -7,6 +7,8 @@ interface Props {
   onClick: () => void
 }
 
+/** Stylized hamburger button with animations */
+
 const HamburgerButton: FC<Props> = ({
   className,
   expanded,

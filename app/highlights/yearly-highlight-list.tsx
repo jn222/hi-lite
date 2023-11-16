@@ -3,6 +3,10 @@ import { formatIsoString } from "../lib/utils/time"
 import { type Highlight } from "../types/highlight.types"
 import HighlightList from "./highlight-list"
 
+/**
+ * Utility function for grouping highlights by year
+ */
+
 const groupHighlightsByYear = (
   highlights: Highlight[]
 ): Record<string, Highlight[]> => {
@@ -24,6 +28,11 @@ interface Props {
   onSelect: (highlight: Highlight) => void
 }
 
+/**
+ * Top level highlight list. Separate from other designations
+ * due to years being displayed altogether
+ */
+
 const YearlyHighlightList: FC<Props> = ({
   highlights = [],
   onSelect
@@ -35,7 +44,7 @@ const YearlyHighlightList: FC<Props> = ({
       (highlight: Highlight) => highlight.designation.includes("year")
     )
     return (
-      <>
+      <div key={year}>
         {!yearlyHighlight && <p className="my-2 text-2xl">{year}</p>}
         <HighlightList
           selectedHighlight={yearlyHighlight}
@@ -43,7 +52,7 @@ const YearlyHighlightList: FC<Props> = ({
           timeWindow={"year"}
           onSelect={onSelect}
         />
-      </>
+      </div>
     )
   })
 }

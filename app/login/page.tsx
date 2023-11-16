@@ -11,6 +11,10 @@ import ErrorText from "../components/error-text"
 import { UserApi } from "../services/user-api/user-api"
 import { useUserStore } from "../store/store"
 
+/**
+ * Login page
+ */
+
 const Page: FC = () => {
   const router = useRouter()
   const { setUser } = useUserStore()

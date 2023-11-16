@@ -10,6 +10,8 @@ import Account from "./account"
 import { UserApi } from "@/app/services/user-api/user-api"
 import { useUserStore } from "@/app/store/store"
 
+/** Responsive navigation menu */
+
 const NavigationBar: FC = () => {
   const router = useRouter()
   const [expanded, setExpanded] = useState(false)

@@ -17,6 +17,8 @@ interface Props {
   onBlur?: (e: FocusEvent<any, Element>) => void
 }
 
+/** Stylized input component */
+
 const Input: FC<Props> = ({
   type = "text",
   className = "",
