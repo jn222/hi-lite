@@ -2,7 +2,11 @@
 
 import GrowWrapper from "../components/grow-wrapper"
 import { type FC, useEffect, useState } from "react"
-import { orderedTimeUnits, range } from "../lib/utils/time"
+import {
+  orderedTimeUnits,
+  range,
+  convertToUTC
+} from "../lib/utils/time"
 import { type Highlight, type TimeUnit } from "../types/highlight.types"
 import HighlightList from "./highlight-list"
 import { useRouter } from "next/navigation"
@@ -28,24 +32,26 @@ const Page: FC = () => {
   ): void => {
     let queryStart, queryEnd
     if (date && designation) {
+      // Assume all dates are returned in UTC
       const { start, end } = range(designation, date)
-      queryStart = start
-      queryEnd = end
+      queryStart = convertToUTC(start)
+      queryEnd = convertToUTC(end)
     }
-    HighlightApi.getHighlights(
-      designation === "year"
-        ? ["year", "month"]
-        : designation
-        ? [designation]
-        : undefined,
-      queryStart,
-      queryEnd
-    )
+    // TODO: Relook at implementation
+    const listDesignations: Record<TimeUnit, Array<TimeUnit | undefined>> = {
+      year: ["month"],
+      // Not all weekly highlights are monthly highlights
+      month: ["month", "week"],
+      week: ["day"],
+      day: ["day", undefined]
+    }
+    const queryDesignation = designation
+      ? listDesignations[designation]
+      : undefined
+    HighlightApi.getHighlights(queryDesignation, queryStart, queryEnd)
       .then((res) => {
-        if (res.data.length) {
-          setHighlights([...res.data])
-          callback && callback(res.data)
-        }
+        setHighlights([...res.data])
+        callback && callback(res.data)
       })
       .catch((err) => {
         console.error(err)
@@ -56,40 +62,48 @@ const Page: FC = () => {
     fetchHighlights(timeWindow)
   }, [])
 
+  /**
+   * We call fetchHighlights manually instead of through a useEffect hook
+   * to handle the back call, so we can find the highest ranking highlight and
+   * re-set it to the selected highlight. Storing it in a tree is another option,
+   * but that may get convoluted.
+   * Caution note: state will not change within a call to a callback so use precalculated newTimeWindow
+   */
+
   const selectHighlight = (highlight: Highlight): void => {
+    // Whenever a highlight is drilled down into, fetch all highlights with the designation below
     const newTimeWindow =
       orderedTimeUnits[orderedTimeUnits.indexOf(timeWindow) - 1]
-    // Ugly workaround for typing
-    newTimeWindow !== "time" && setTimeWindow(newTimeWindow)
+    // TODO: Ugly workaround for typing for now. window will never be "time" in this case
+    if (newTimeWindow === "time") return
+    setTimeWindow(newTimeWindow)
     setSelectedHighlight(highlight)
-    fetchHighlights(
-      // Ugly workaround for typing
-      newTimeWindow !== "time" ? newTimeWindow : undefined,
-      highlight.created_at
-    )
+    fetchHighlights(newTimeWindow, highlight.created_at)
   }
 
   const back = (): void => {
+    // Whenever we go back, fetch all highlights with the designation above
     if (timeWindow === "year") {
       router.push("/")
     } else {
       const newTimeWindow =
         orderedTimeUnits[orderedTimeUnits.indexOf(timeWindow) + 1]
-      // Ugly workaround for typing
-      newTimeWindow !== "time" && setTimeWindow(newTimeWindow)
+      // TODO: Ugly workaround for typing for now. window will never be "time" in this case
+      if (newTimeWindow === "time") return
+      setTimeWindow(newTimeWindow)
       if (newTimeWindow === "year") {
         setSelectedHighlight(undefined)
         fetchHighlights("year")
       } else {
         const callback = (highlights: Highlight[]): void => {
-          // Fetch in broader time window, set selected highlight based on which has correct designation
+          // Fetch in broader time window, set selected highlight based on which has the selected designation
           setSelectedHighlight(
             highlights?.find((highlight) =>
-              highlight.designation.includes(timeWindow)
+              highlight.designation.includes(newTimeWindow)
             )
           )
         }
-        fetchHighlights(timeWindow, selectedHighlight?.created_at, callback)
+        fetchHighlights(newTimeWindow, selectedHighlight?.created_at, callback)
       }
     }
   }

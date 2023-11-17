@@ -70,7 +70,9 @@ Start a production build
 - Make intro/about page to hide entry page if not logged in
 - Make storybook work
 - Centralize stylings
+- Figure out how to make time typings more straightforward (no "time")
+- Add save confirmation animation for highlights
 
 ## Known bugs
 
-- When there are skips in hierarchy, the highlights page sometimes is blank
+- Check timezone edge cases

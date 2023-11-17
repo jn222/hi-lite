@@ -1,7 +1,7 @@
 import classNames from "classnames"
 import GrowWrapper from "../components/grow-wrapper"
 import Pulse from "../components/pulse"
-import { type TimeFormat, formatIsoString } from "../lib/utils/time"
+import { type TimeFormat, formatIsoString, range } from "../lib/utils/time"
 import { type Highlight } from "../types/highlight.types"
 import { type FC } from "react"
 
@@ -22,6 +22,12 @@ const HighlightListItem: FC<Props> = ({
   timeWindow,
   variant = "small"
 }: Props) => {
+  // We need to use range for formatting the week so it shows the right start date of the week
+  // Assume all dates are returned in UTC
+  const displayTime =
+    timeWindow === "week"
+      ? range(timeWindow, highlight.created_at).start
+      : highlight.created_at
   return variant === "small" ? (
     <div key={highlight.id} className="mb-4 text-xl">
       <div className="border-l-white border-[1px] w-0 h-16 mx-auto animate-y-scale" />
@@ -42,7 +48,7 @@ const HighlightListItem: FC<Props> = ({
           )}
         >
           <p className="text-gray-400">
-            {formatIsoString(timeWindow, highlight.created_at)}
+            {formatIsoString(timeWindow, displayTime)}
           </p>
           <p>{highlight.content}</p>
         </div>
@@ -52,7 +58,7 @@ const HighlightListItem: FC<Props> = ({
     <div>
       <GrowWrapper className="mt-10 text-2xl inline-block">
         <p className="text-gray-400">
-          {formatIsoString(timeWindow, highlight.created_at)}
+          {formatIsoString(timeWindow, displayTime)}
         </p>
         <p className="my-2">{highlight.content}</p>
         <Pulse variant="large" className="mx-auto" />

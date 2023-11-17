@@ -3,11 +3,10 @@ import { type Highlight, type TimeUnit } from "../../types/highlight.types"
 import { type PendingHighlightData } from "./highlight-api.types"
 
 const url = process.env.NEXT_PUBLIC_API_URL + "/highlights"
-console.log(url)
 
 export const HighlightApi = {
   getHighlights: async (
-    designations?: TimeUnit[],
+    designations?: Array<TimeUnit | undefined>,
     start?: string,
     end?: string
   ): Promise<AxiosResponse<Highlight[]>> => {
@@ -45,10 +44,13 @@ export const HighlightApi = {
     )
   },
 
-  getPendingHighlights: async (): Promise<
-    AxiosResponse<PendingHighlightData>
-  > => {
+  getPendingHighlights: async (
+    timezone: string
+  ): Promise<AxiosResponse<PendingHighlightData>> => {
     return await Axios.get<PendingHighlightData>(url + "/pending", {
+      params: {
+        timezone
+      },
       withCredentials: true
     })
   }

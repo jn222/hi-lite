@@ -6,6 +6,7 @@ import Button from "./components/button"
 import { type TimeUnit } from "./types/highlight.types"
 import ErrorText from "./components/error-text"
 import { HighlightApi } from "./services/highlight-api/highlight-api"
+import { clientTimeZone } from "./lib/utils/time"
 
 // TODO document each component
 
@@ -17,7 +18,8 @@ const Page: FC = () => {
   const [selectionError, setSelectionError] = useState<string>("")
 
   const fetchPendingHighlights = (): void => {
-    HighlightApi.getPendingHighlights()
+    // Specify timezone to make sure ranges are in local time, not utc time
+    HighlightApi.getPendingHighlights(clientTimeZone)
       .then((res) => {
         setHighlights([...res.data.highlights])
         setDesignation(res.data.designation)

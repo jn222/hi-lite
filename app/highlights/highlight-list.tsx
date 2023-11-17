@@ -24,23 +24,25 @@ const HighlightList: FC<Props> = ({
   const listTimeWindow = orderedTimeUnits[index]
   return (
     <div>
-      {selectedHighlight && (
-        <HighlightListItem
-          variant="large"
-          highlight={selectedHighlight}
-          timeWindow={timeWindow}
-        />
-      )}
-      {highlights?.length ? (
-        highlights.map((highlight, index) => (
-          <HighlightListItem
-            key={highlight.id}
-            highlight={highlight}
-            onSelect={onSelect}
-            animationOrder={index}
-            timeWindow={listTimeWindow}
-          />
-        ))
+      {selectedHighlight ?? highlights?.length ? (
+        <>
+          {selectedHighlight && (
+            <HighlightListItem
+              variant="large"
+              highlight={selectedHighlight}
+              timeWindow={timeWindow}
+            />
+          )}
+          {highlights?.map((highlight, index) => (
+            <HighlightListItem
+              key={highlight.id}
+              highlight={highlight}
+              onSelect={onSelect}
+              animationOrder={index}
+              timeWindow={listTimeWindow}
+            />
+          ))}
+        </>
       ) : (
         <GrowWrapper className="my-2 text-2xl inline-block">
           <p>No highlights to show.</p>
