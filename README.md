@@ -72,6 +72,7 @@ Start a production build
 - Centralize stylings
 - Figure out how to make time typings more straightforward (no "time")
 - Add save confirmation animation for highlights
+- Figure out how to show lowest designation with highlights
 
 ## Known bugs
 
