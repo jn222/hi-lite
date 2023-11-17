@@ -77,3 +77,4 @@ Start a production build
 ## Known bugs
 
 - Check timezone edge cases
+- Render empty state in highlight view when user isn't logged in
