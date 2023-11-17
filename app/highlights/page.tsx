@@ -2,11 +2,7 @@
 
 import GrowWrapper from "../components/grow-wrapper"
 import { type FC, useEffect, useState } from "react"
-import {
-  orderedTimeUnits,
-  range,
-  convertToUTC
-} from "../lib/utils/time"
+import { orderedTimeUnits, range, convertToUTC } from "../lib/utils/time"
 import { type Highlight, type TimeUnit } from "../types/highlight.types"
 import HighlightList from "./highlight-list"
 import { useRouter } from "next/navigation"
@@ -50,6 +46,8 @@ const Page: FC = () => {
       : undefined
     HighlightApi.getHighlights(queryDesignation, queryStart, queryEnd)
       .then((res) => {
+        // TODO if empty, refetch one level lower
+        // TODO genericize top level list
         setHighlights([...res.data])
         callback && callback(res.data)
       })
